@@ -4,6 +4,7 @@ import Combine
 
 class SessionManager: ObservableObject {
     @Published var isTracking = false
+    @Published var isPaused = false
     @Published var currentSession: SessionData?
     
     private var timer: AnyCancellable?
@@ -13,7 +14,21 @@ class SessionManager: ObservableObject {
     func start() {
         currentSession = SessionData(startTime: Date())
         isTracking = true
-        
+        isPaused = false
+        startTimer()
+    }
+    
+    func pause() {
+        isPaused = true
+        timer?.cancel()
+    }
+    
+    func resume() {
+        isPaused = false
+        startTimer()
+    }
+    
+    private func startTimer() {
         timer = Timer.publish(every: pollingInterval, on: .main, in: .common)
             .autoconnect()
             .sink { [weak self] _ in
@@ -24,10 +39,10 @@ class SessionManager: ObservableObject {
     func stop() {
         timer?.cancel()
         isTracking = false
+        isPaused = false
         
         if let session = currentSession {
             session.endTime = Date()
-            // Hardcoded password as requested
             PDFGenerator.generate(for: session, password: "test123")
         }
         currentSession = nil
@@ -35,7 +50,6 @@ class SessionManager: ObservableObject {
     
     private func pulse() {
         guard let session = currentSession else { return }
-        
         let anyEvent = CGEventType(rawValue: ~0)!
         let secondsSinceInput = CGEventSource.secondsSinceLastEventType(.combinedSessionState, eventType: anyEvent)
         
