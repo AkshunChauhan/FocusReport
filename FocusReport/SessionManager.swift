@@ -52,7 +52,7 @@ class SessionManager: ObservableObject {
         } else {
             isAutomationGranted = false
             if let err = error {
-                permissionError = "Automation Permission Missing: \(err[NSAppleScriptErrorMessage] ?? "Unknown Error")"
+                permissionError = "Automation Permission Missing: \(err[NSAppleScript.errorMessage] ?? "Unknown Error")"
             }
         }
     }
@@ -105,7 +105,7 @@ class SessionManager: ObservableObject {
         if let session = currentSession {
             session.endTime = Date()
             session.addEvent(.stop)
-            PDFGenerator.generate(for: session, password: "test123")
+            PDFGenerator.generate(for: session, password: "Chauhan099")
         }
         currentSession = nil
     }
@@ -266,7 +266,7 @@ class SessionManager: ObservableObject {
         let output = script?.executeAndReturnError(&error)
         
         if let err = error {
-            let code = err[NSAppleScriptErrorNumber] as? Int ?? 0
+            let code = err[NSAppleScript.errorNumber] as? Int ?? 0
             // If error is -1712 (timeout) or -1743 (permission), log it
             if code == -1743 {
                 DispatchQueue.main.async { self.isAutomationGranted = false }
