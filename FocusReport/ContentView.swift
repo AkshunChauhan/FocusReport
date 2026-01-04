@@ -24,7 +24,36 @@ struct ContentView: View {
     
     // MARK: - Simplified Employee Dashboard
     private var mainDashboard: some View {
-        VStack(spacing: 40) {
+        VStack(spacing: 20) {
+            // Permission Warnings
+            if !manager.isAccessibilityGranted || !manager.isAutomationGranted {
+                VStack(spacing: 12) {
+                    HStack {
+                        Image(systemName: "exclamationmark.triangle.fill")
+                            .foregroundColor(.orange)
+                        Text("System Permissions Required")
+                            .font(.headline)
+                        Spacer()
+                        Button("Fix Permissions") {
+                            manager.checkPermissions()
+                            let options = [kAXTrustedCheckOptionPrompt.takeUnretainedValue() as String: true]
+                            AXIsProcessTrustedWithOptions(options as CFDictionary)
+                        }
+                        .buttonStyle(.bordered)
+                    }
+                    .padding()
+                    .background(Color.orange.opacity(0.1))
+                    .cornerRadius(8)
+                    
+                    if !manager.isAutomationGranted {
+                        Text("Please allow 'Automation' for Chrome/Safari in System Settings > Privacy & Security.")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
+                }
+                .transition(.move(edge: .top).combined(with: .opacity))
+            }
+
             VStack(spacing: 12) {
                 Text(manager.isTracking ? "Session Active" : "Ready to Start")
                     .font(.title).bold()

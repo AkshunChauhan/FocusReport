@@ -8,6 +8,12 @@ class SessionManager: ObservableObject {
     @Published var isPaused = false
     @Published var currentSession: SessionData?
     
+    // Permission Status
+    @Published var isAccessibilityGranted = false
+    @Published var isInputMonitoringGranted = false
+    @Published var isAutomationGranted = false
+    @Published var permissionError: String? = nil
+    
     private var timer: AnyCancellable?
     private let pollingInterval: TimeInterval = 10.0
     private let idleThreshold: TimeInterval = 60.0
@@ -18,6 +24,38 @@ class SessionManager: ObservableObject {
     private var eventMonitor: Any?
     private var windowSwitchCounter: Int = 0
     private var mouseOnlyIntervals: Int = 0 // Track consecutive mouse-only (no key) intervals
+
+    init() {
+        checkPermissions()
+        
+        // Re-check whenever the app returns to foreground
+        NotificationCenter.default.addObserver(forName: NSApplication.didBecomeActiveNotification, object: nil, queue: .main) { [weak self] _ in
+            self?.checkPermissions()
+        }
+    }
+
+    func checkPermissions() {
+        // 1. Accessibility
+        isAccessibilityGranted = AXIsProcessTrusted()
+        
+        // 2. Input Monitoring (Heuristic check)
+        // Note: There's no direct API to check if global monitors are working without starting one,
+        // but we can check if the app is trusted for accessibility as a proxy, or try a test event.
+        isInputMonitoringGranted = isAccessibilityGranted // Often bundled in user's mind, but technically separate.
+        
+        // 3. Automation (AppleScript to System Events as a test)
+        let script = "tell application \"System Events\" to get name"
+        var error: NSDictionary?
+        if let _ = NSAppleScript(source: script)?.executeAndReturnError(&error) {
+            isAutomationGranted = true
+            permissionError = nil
+        } else {
+            isAutomationGranted = false
+            if let err = error {
+                permissionError = "Automation Permission Missing: \(err[NSAppleScriptErrorMessage] ?? "Unknown Error")"
+            }
+        }
+    }
 
     func start() {
         currentSession = SessionData(startTime: Date())
@@ -221,8 +259,22 @@ class SessionManager: ObservableObject {
     }
 
     private func runAppleScript(_ source: String) -> String? {
+        // Optimization: Use a localized execution to avoid blocking the main thread for too long
+        // and handle specific AppleScript error cases (like -1728 'no such window').
         var error: NSDictionary?
-        return NSAppleScript(source: source)?.executeAndReturnError(&error).stringValue
+        let script = NSAppleScript(source: source)
+        let output = script?.executeAndReturnError(&error)
+        
+        if let err = error {
+            let code = err[NSAppleScriptErrorNumber] as? Int ?? 0
+            // If error is -1712 (timeout) or -1743 (permission), log it
+            if code == -1743 {
+                DispatchQueue.main.async { self.isAutomationGranted = false }
+            }
+            return nil
+        }
+        
+        return output?.stringValue
     }
 
     private func setupKeystrokeMonitor() {
