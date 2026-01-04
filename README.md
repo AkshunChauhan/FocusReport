@@ -43,7 +43,7 @@ This project is shared for transparency and personal use. **Unauthorized resale,
 ### Building from Source
 1. Clone the repository:
    ```bash
-   git clone https://github.com/[your-username]/FocusReport.git
+   git clone https://github.com/AkshunChauhan/FocusReport.git
    ```
 2. Open `FocusReport.xcodeproj` in Xcode.
 3. Select your target and build (Cmd + R).
