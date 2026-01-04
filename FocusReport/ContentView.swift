@@ -1,3 +1,12 @@
+//
+//  ContentView.swift
+//  FocusReport
+//
+//  Created by Akshun Chauhan.
+//  Copyright © 2026 Akshun Chauhan. All rights reserved.
+//  Unauthorized resale or redistribution is strictly prohibited.
+//
+
 import SwiftUI
 import Combine
 
@@ -124,8 +133,29 @@ struct ContentView: View {
             
             Text("System Information")
                 .font(.headline)
-            Text("Version: 2.1.0 (Stable)")
-            Text("Last Sync: \(Date().formatted())")
+            VStack(alignment: .leading, spacing: 4) {
+                Text("Version: 2.1.0 (Stable)")
+                Text("Last Sync: \(Date().formatted())")
+            }
+            .font(.subheadline)
+            
+            Divider()
+            
+            VStack(alignment: .leading, spacing: 10) {
+                Text("Developer Information")
+                    .font(.headline)
+                
+                HStack {
+                    Image(systemName: "person.circle.fill")
+                        .foregroundColor(.blue)
+                    Text("Built by **Akshun Chauhan**")
+                }
+                
+                Text("© 2026 All Rights Reserved. FocusReport is a proprietary tool developed for high-fidelity auditing.")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+            }
+            .padding(.top, 5)
             
             Spacer()
         }

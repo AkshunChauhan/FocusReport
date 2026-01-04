@@ -1,4 +1,13 @@
 import AppKit
+//
+//  SessionManager.swift
+//  FocusReport
+//
+//  Created by Akshun Chauhan.
+//  Copyright © 2026 Akshun Chauhan. All rights reserved.
+//  Unauthorized resale or redistribution is strictly prohibited.
+//
+
 import Foundation
 import Combine
 import CoreAudio
@@ -105,7 +114,7 @@ class SessionManager: ObservableObject {
         if let session = currentSession {
             session.endTime = Date()
             session.addEvent(.stop)
-            PDFGenerator.generate(for: session, password: "Chauhan099")
+            PDFGenerator.generate(for: session, password: "test123") // Change the passward to anything 
         }
         currentSession = nil
     }

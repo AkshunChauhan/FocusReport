@@ -1,3 +1,12 @@
+//
+//  PDFGenerator.swift
+//  FocusReport
+//
+//  Created by Akshun Chauhan.
+//  Copyright © 2026 Akshun Chauhan. All rights reserved.
+//  Unauthorized resale or redistribution is strictly prohibited.
+//
+
 import Foundation
 import PDFKit
 import AppKit
@@ -66,7 +75,7 @@ struct PDFGenerator {
         
         // Table Headers
         let headers = ["Time", "App / Window / Context", "Keys", "Status"]
-        let xOffsets: [CGFloat] = [40, 85, 490, 535]
+        let xOffsets: [CGFloat] = [40, 115, 490, 535]
         
         for (index, header) in headers.enumerated() {
             let attrs: [NSAttributedString.Key: Any] = [.font: NSFont.boldSystemFont(ofSize: 8)]

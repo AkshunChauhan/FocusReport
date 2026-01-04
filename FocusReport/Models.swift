@@ -1,3 +1,12 @@
+//
+//  Models.swift
+//  FocusReport
+//
+//  Created by Akshun Chauhan.
+//  Copyright © 2026 Akshun Chauhan. All rights reserved.
+//  Unauthorized resale or redistribution is strictly prohibited.
+//
+
 import Foundation
 
 // This is the core "Forensic" data point
